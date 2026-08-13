@@ -257,6 +257,11 @@ Safety, in order of how much damage getting it wrong does:
   specific trap; assume any workflow trigger you add is wrong until you have checked it against
   that.
 - Credentials belong in no commit, log, issue report or pull request description.
+- **Pin GitHub Actions to a full commit SHA of the latest release, with the version as a trailing
+  comment** — `uses: actions/checkout@3d3c42e… # v7.0.1`. A tag is mutable, so a compromised
+  upstream can repoint it at new code; the comment is what makes the pin readable, and Dependabot
+  updates both together. Steps from the same action must share one SHA — `github/codeql-action`
+  errors when `analyze` loads a config that `init` wrote on a different version.
 - Report vulnerabilities privately through the advisory link in `SECURITY.md`, never a public issue.
 
 ## If you are an agent
