@@ -1,0 +1,65 @@
+{
+  "name": "night-shift",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A night shift of GitHub Copilot cloud agents maintaining the self-hosted GitHub Actions infrastructure they run on.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/m-howard/night-shift.git"
+  },
+  "homepage": "https://github.com/m-howard/night-shift#readme",
+  "bugs": {
+    "url": "https://github.com/m-howard/night-shift/issues"
+  },
+  "type": "module",
+  "main": "src/index.ts",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "lint:md": "markdownlint-cli2 \"**/*.md\" \"!**/node_modules/**\" \"!.claude/skills/**\"",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --project unit",
+    "test:watch": "vitest --project unit",
+    "test:coverage": "vitest run --project unit --coverage",
+    "test:integration": "vitest run --project integration",
+    "clean": "bash scripts/clean.sh",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "@pulumi/aws": "7.41.0",
+    "@pulumi/awsx": "3.8.0",
+    "@pulumi/github": "6.14.1",
+    "@pulumi/pulumi": "3.256.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/bun": "1.3.14",
+    "@types/node": "26.1.2",
+    "@vitest/coverage-v8": "4.1.10",
+    "eslint": "10.8.1",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-import-x": "4.17.1",
+    "github-slugger": "1.5.0",
+    "husky": "9.1.7",
+    "markdownlint-cli2": "0.23.2",
+    "nano-staged": "1.0.2",
+    "prettier": "3.9.6",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "8.66.0",
+    "vitest": "4.1.10"
+  },
+  "nano-staged": {
+    "*.{md,mjs,ts,json}": [
+      "bun run format"
+    ],
+    "*.{mjs,ts}": [
+      "bun run lint"
+    ]
+  }
+}

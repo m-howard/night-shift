@@ -1,0 +1,46 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# Dependencies. No leading slash: `infra/pulumi` will carry its own node_modules alongside the
+# root one. A root-anchored pattern would leave that untracked but not ignored, which is one
+# `git add -A` away from committing it.
+node_modules/
+.pnp
+.pnp.*
+
+# Testing
+coverage/
+/output/
+
+/data
+
+# Build output
+build/
+/bin
+dist/
+.tsbuild/
+
+# ...but `scripts/build/` holds the tooling that *produces* build output, not the output itself.
+# Without this negation the pattern above swallows it silently: `git add` reports nothing, the
+# file never lands, and the first clean clone discovers it when the script it needed is missing.
+# The same trap exists in .prettierignore and eslint.config.mjs; all three are negated together.
+!scripts/build/
+
+# Pulumi. State lives in the local file backend (`pulumi login --local`), and stack config may
+# carry encrypted secrets — but Pulumi.<stack>.yaml itself is committed.
+.pulumi/
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.pnpm-store/
+.eslintcache
+
+# Env files (can opt-in for committing if needed)
+.env*
+!.env.example

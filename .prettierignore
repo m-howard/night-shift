@@ -1,0 +1,14 @@
+node_modules
+dist
+bin
+build
+
+coverage
+.env
+*.log
+bun.lock
+
+# Exported verbatim from Claude Design and re-synced wholesale, so formatting it here would be
+# undone by the next export. The CSS also column-aligns its token comments, which Prettier
+# collapses — the alignment is what makes the palette scannable.
+.claude/skills/

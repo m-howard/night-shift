@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "target": "ES2024",
+    "lib": ["ES2024"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+
+    // Nothing here is compiled: Pulumi runs TypeScript through its own loader and Vitest
+    // transpiles per file. `tsc` is a checker in this repo, not a build step. Revisit if
+    // something ever needs to ship as JavaScript.
+    "noEmit": true,
+    "skipLibCheck": true,
+
+    // Relative imports carry their real `.ts` extension. Node 24 strips types and resolves them
+    // natively, Vite resolves them natively, and nothing has to guess at a `.js` file that is
+    // never written to disk. Legal only because nothing is emitted.
+    "allowImportingTsExtensions": true,
+
+    "types": ["node"]
+  },
+  "include": ["src", "tests", "scripts", "*.config.ts"]
+}

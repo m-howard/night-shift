@@ -1,0 +1,9 @@
+node_modules
+dist
+bin
+build
+coverage
+
+# Exported verbatim from Claude Design and re-synced wholesale. Also excluded in the `lint:md`
+# script glob, because markdownlint-cli2 only consults this file in some invocations.
+.claude/skills/

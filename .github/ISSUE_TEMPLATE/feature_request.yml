@@ -1,0 +1,43 @@
+name: Feature request
+description: Suggest a capability or a change of direction
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Night Shift is a pattern demonstration: coding agents maintaining the self-hosted Actions
+        infrastructure they run on. Requests that widen what agents may change without a human
+        are the ones worth thinking hardest about.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What are you unable to do today? Describe the situation, not the solution.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you would like to happen
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+      description: Including doing nothing, and why that is not enough.
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope
+      options:
+        - label: >
+            If this lets an agent change something new, the change is either reversible without a
+            human or gated behind an explicit approval — not merely unlikely to go wrong.
+        - label: >
+            This does not grant the runner fleet permissions beyond what the work in front of it
+            needs.

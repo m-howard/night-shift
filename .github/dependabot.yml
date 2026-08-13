@@ -1,0 +1,54 @@
+version: 2
+
+updates:
+  # Bun is the only package manager, and this is a single-package repo, so there is one manifest
+  # to watch. Add /infra/pulumi here when that workspace lands.
+  - package-ecosystem: npm
+    directory: '/'
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: 'chore(deps)'
+      prefix-development: 'chore(deps-dev)'
+    groups:
+      pulumi:
+        patterns: ['@pulumi/*']
+      linting:
+        patterns: ['eslint*', '@eslint/*', 'typescript-eslint', 'prettier', 'markdownlint*']
+      testing:
+        patterns: ['vitest', '@vitest/*']
+    ignore:
+      # Pinned deliberately: typescript-eslint@8 declares `typescript >=4.8.4 <6.1.0`, so a
+      # major bump breaks type-aware linting on install.
+      - dependency-name: typescript
+        update-types: [version-update:semver-major]
+
+  - package-ecosystem: github-actions
+    directory: '/'
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: 'ci(deps)'
+
+  # The dev container image. Left unwatched, its base tag went two Debian releases stale before
+  # anyone noticed.
+  - package-ecosystem: docker
+    directory: '/.devcontainer'
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: 'chore(deps)'
+
+  # Feature pins in .devcontainer/devcontainer.json and its lock file. Feature majors can change
+  # behaviour, so these arrive as reviewable pull requests rather than a floating tag.
+  - package-ecosystem: devcontainers
+    directory: '/'
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: 'chore(deps)'
