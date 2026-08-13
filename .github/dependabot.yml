@@ -2,7 +2,7 @@ version: 2
 
 updates:
   # Bun is the only package manager, and this is a single-package repo, so there is one manifest
-  # to watch. Add /infra/pulumi here when that workspace lands.
+  # to watch — the Pulumi stack in src/ shares it.
   - package-ecosystem: npm
     directory: '/'
     schedule:

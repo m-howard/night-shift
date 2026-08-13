@@ -52,7 +52,7 @@ pulumi login --local
 > **Status:** the runner infrastructure is not written yet. This repository currently carries the
 > toolchain, conventions and policy scaffolding the stack will be built inside.
 
-The Pulumi stack under `infra/pulumi/` will describe the self-hosted Actions runner fleet on AWS —
+The Pulumi stack under `src/` will describe the self-hosted Actions runner fleet on AWS —
 the same fleet the night shift's own jobs execute on, which is what makes the demonstration honest.
 
 ## 📁 Project structure
@@ -60,12 +60,12 @@ the same fleet the night shift's own jobs execute on, which is what makes the de
 ```text
 .devcontainer/       # Pinned toolchain — versions are read from .nvmrc, .bun-version, package.json
 .github/workflows/   # GitHub Actions pipelines
-src/                 # Shared TypeScript
+src/                 # The Pulumi stack — AWS runner infrastructure (planned)
+└── components/      # Reusable Pulumi components
 tests/
 ├── unit/            # No credentials, no network — the default `bun run test`
 ├── integration/     # Runs against live AWS; fails loudly when unconfigured
-└── support/         # Test helpers
-infra/pulumi/        # AWS runner infrastructure (planned)
+└── helpers/         # Test helpers
 scripts/             # Repository tooling
 ```
 

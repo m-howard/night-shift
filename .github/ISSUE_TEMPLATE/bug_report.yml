@@ -13,7 +13,7 @@ body:
     attributes:
       label: Component
       options:
-        - infra/pulumi (the AWS stack)
+        - src (the Pulumi AWS stack)
         - .github/workflows (CI and the agent schedule)
         - dev container
         - tests

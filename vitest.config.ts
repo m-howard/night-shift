@@ -30,7 +30,7 @@ export default defineConfig({
     ],
     coverage: {
       provider: 'v8',
-      include: ['src/**/*.ts', 'tests/support/**/*.ts'],
+      include: ['src/**/*.ts', 'tests/helpers/**/*.ts'],
       reporter: ['text', 'lcov'],
     },
   },

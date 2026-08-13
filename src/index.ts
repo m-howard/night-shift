@@ -1,8 +1,8 @@
 /**
  * Night Shift — entry point.
  *
- * Deliberately empty. The infrastructure this repo maintains lives under `infra/pulumi/` (not yet
- * written); anything shared between that stack and the tooling around it lands here.
+ * Deliberately empty. The Pulumi stack this repo maintains lands in this directory (not yet
+ * written), with reusable components under `src/components/`.
  */
 
 export {};

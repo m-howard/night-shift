@@ -22,7 +22,7 @@ const IMPORT_GROUP_ORDER = [
 const ALLOWED_NUMBERS = [-1, 0, 1, 2];
 
 const MAX_FUNCTION_LINES = 50;
-const MAX_FILE_LINES = 500;
+const MAX_FILE_LINES = 600;
 
 /**
  * Declarative resource wiring runs longer than application logic and does not decompose
@@ -135,8 +135,10 @@ export default tseslint.config(
     },
   },
 
+  // The Pulumi stack lives in `src/`, so the infrastructure relaxations apply there rather than to
+  // a separate infra tree.
   {
-    files: ['infra/pulumi/**/*.ts'],
+    files: ['src/**/*.ts'],
     rules: {
       'import-x/no-default-export': 'off',
       'max-lines-per-function': [

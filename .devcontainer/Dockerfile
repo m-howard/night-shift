@@ -5,7 +5,7 @@
 # `package.json`), so there is exactly one place to bump each of them and the container cannot
 # drift from the repo again. That requires the build context to be the repo root —
 # `devcontainer.json` sets `"context": ".."` for this reason. Note that this is why `@pulumi/*`
-# stays in the root manifest even before `infra/pulumi` exists: drop it and this falls back to
+# stays in the root manifest even before the stack in `src/` exists: drop it and this falls back to
 # installing whatever the latest Pulumi release happens to be.
 FROM mcr.microsoft.com/devcontainers/base:bookworm
 

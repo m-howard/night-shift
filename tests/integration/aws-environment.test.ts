@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { requireEnv } from '../support/env.ts';
+import { requireEnv } from '../helpers/env.ts';
 
 /**
  * Read at module scope on purpose: an unconfigured run fails during collection, before any test
@@ -16,5 +16,5 @@ describe('AWS environment', () => {
   });
 });
 
-// Assertions against real resources land here once `infra/pulumi` exists and the stack has
+// Assertions against real resources land here once the stack in `src/` exists and has
 // outputs to read — runner registration, instance health, and the IAM role the fleet assumes.

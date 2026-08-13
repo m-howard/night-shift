@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { requireEnv } from '../support/env.ts';
+import { requireEnv } from '../helpers/env.ts';
 
 const VARIABLE = 'NIGHT_SHIFT_TEST_VARIABLE';
 
