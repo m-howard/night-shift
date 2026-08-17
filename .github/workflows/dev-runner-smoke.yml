@@ -1,0 +1,114 @@
+name: Dev Runner Smoke Test
+
+on:
+    push:
+        branches: [feat/test-workflow]
+    workflow_dispatch:
+
+concurrency:
+    group: dev-runner-smoke-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions:
+    contents: read
+
+jobs:
+    smoke:
+        name: "${{ matrix.class }} (${{ matrix.arch }})"
+        runs-on: ["${{ matrix.label }}"]
+        timeout-minutes: ${{ matrix.timeout }}
+
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - class: linuxAmd64
+                      label: linux-dev
+                      arch: x86_64
+                      timeout: 10
+                    - class: linuxArm64
+                      label: linux-arm64-dev
+                      arch: aarch64
+                      timeout: 10
+                    - class: codingAgent
+                      label: copilot-coding-agent-dev
+                      arch: x86_64
+                      timeout: 10
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Verify architecture
+              run: |
+                  ACTUAL_ARCH="$(uname -m)"
+                  EXPECTED="${{ matrix.arch }}"
+                  echo "Expected: $EXPECTED"
+                  echo "Actual:   $ACTUAL_ARCH"
+                  if [[ "$ACTUAL_ARCH" != "$EXPECTED" ]]; then
+                    echo "::error::Architecture mismatch — expected $EXPECTED but got $ACTUAL_ARCH"
+                    exit 1
+                  fi
+
+            - name: Runner environment info
+              run: |
+                  echo "### Runner Environment" >> "$GITHUB_STEP_SUMMARY"
+                  echo "| Property | Value |" >> "$GITHUB_STEP_SUMMARY"
+                  echo "|----------|-------|" >> "$GITHUB_STEP_SUMMARY"
+                  echo "| **Runner class** | \`${{ matrix.class }}\` |" >> "$GITHUB_STEP_SUMMARY"
+                  echo "| **Label** | \`${{ matrix.label }}\` |" >> "$GITHUB_STEP_SUMMARY"
+                  echo "| **Runner name** | \`${{ runner.name }}\` |" >> "$GITHUB_STEP_SUMMARY"
+                  echo "| **Runner OS** | \`${{ runner.os }}\` |" >> "$GITHUB_STEP_SUMMARY"
+                  echo "| **Runner arch** | \`${{ runner.arch }}\` |" >> "$GITHUB_STEP_SUMMARY"
+                  echo "| **Hostname** | \`$(hostname)\` |" >> "$GITHUB_STEP_SUMMARY"
+                  echo "| **Kernel** | \`$(uname -r)\` |" >> "$GITHUB_STEP_SUMMARY"
+                  echo "| **Arch** | \`$(uname -m)\` |" >> "$GITHUB_STEP_SUMMARY"
+
+            - name: CPU and memory
+              run: |
+                  echo "--- CPU ---"
+                  nproc
+                  echo "--- Memory ---"
+                  free -h || cat /proc/meminfo | head -5
+                  echo "--- Disk ---"
+                  df -h . || true
+
+                  {
+                    echo "### Resources"
+                    echo "| Metric | Value |"
+                    echo "|--------|-------|"
+                    echo "| **CPUs** | \`$(nproc)\` |"
+                    MEM=$(free -h 2>/dev/null | awk '/^Mem:/{print $2}' || echo "n/a")
+                    echo "| **Total memory** | \`${MEM}\` |"
+                    DISK=$(df -h . 2>/dev/null | awk 'NR==2{print $2}' || echo "n/a")
+                    echo "| **Disk size** | \`${DISK}\` |"
+                  } >> "$GITHUB_STEP_SUMMARY"
+
+            - name: Workspace write check
+              run: |
+                  TMPFILE="$(mktemp smoke-XXXXXX)"
+                  echo "write-ok" > "$TMPFILE"
+                  if [[ "$(cat "$TMPFILE")" != "write-ok" ]]; then
+                    echo "::error::Workspace is not writable"
+                    exit 1
+                  fi
+                  rm -f "$TMPFILE"
+                  echo "Workspace write check passed."
+
+    summary:
+        name: Smoke Summary
+        if: always()
+        needs: [smoke]
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+        steps:
+            - name: Evaluate results
+              run: |
+                  echo "### Dev Runner Smoke Results" >> "$GITHUB_STEP_SUMMARY"
+                  echo "" >> "$GITHUB_STEP_SUMMARY"
+                  if [[ "${{ needs.smoke.result }}" == "success" ]]; then
+                    echo "All dev runner classes passed smoke tests." >> "$GITHUB_STEP_SUMMARY"
+                  else
+                    echo "One or more runner classes failed. Check individual job logs." >> "$GITHUB_STEP_SUMMARY"
+                    exit 1
+                  fi

@@ -90,6 +90,14 @@ scripts/             # Repository tooling
 a suite that reports green having tested nothing is the one failure mode an auto-deploy pipeline
 cannot afford.
 
+## 📖 Documentation
+
+| Document                                             | Description                                                               |
+| ---------------------------------------------------- | ------------------------------------------------------------------------- |
+| [Developer Quickstart](docs/user_docs/quickstart.md) | Run a first job on the managed runners with working CI and agent examples |
+| [End-User Docs](docs/user_docs/README.md)            | End-user guidance for labels, builds, networking, troubleshooting, and requests |
+| [Operator Docs](docs/operator_docs/README.md)        | Deployment, debugging, validation, and maintenance runbooks for operators |
+
 ## 📖 Conventions
 
 [AGENTS.md](AGENTS.md) records the conventions this repository enforces, for humans and agents

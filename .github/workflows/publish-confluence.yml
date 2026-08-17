@@ -1,0 +1,37 @@
+name: Publish User Docs to Confluence
+
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - 'docs/user_docs/**'
+            - '.github/actions/publish-doc-to-confluence/**'
+            - '.github/workflows/publish-confluence.yml'
+    workflow_dispatch:
+
+permissions:
+    contents: read
+    id-token: write
+
+concurrency:
+    group: publish-user-docs-to-confluence
+    cancel-in-progress: false
+
+jobs:
+    publish-user-docs:
+        name: Publish GitHub Runner User Docs
+        runs-on: ${{ format('codebuild-modernatx-internal-linux-small-{0}-{1}', github.run_id, github.run_attempt) }}
+        timeout-minutes: 15
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+            - name: Publish user docs
+              uses: ./.github/actions/publish-doc-to-confluence
+              with:
+                  SOURCE_PATH: docs/user_docs
+                  CONFLUENCE_PARENT_PAGE: '3427237890'
+                  CONFLUENCE_SPACE: CORE
+                  PAGE_TITLE_PREFIX: '[GitHub Runners]'

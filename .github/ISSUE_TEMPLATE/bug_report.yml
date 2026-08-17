@@ -1,60 +1,67 @@
-name: Bug report
-description: Something behaves differently from how it is documented
-labels: [bug]
+name: Bug Report
+description: Report a bug or unexpected behavior with the self-hosted runners
+labels: ["kind:bug", "status:needs-triage"]
 body:
   - type: markdown
     attributes:
       value: |
-        Security vulnerabilities do **not** belong here — see
-        [SECURITY.md](https://github.com/m-howard/night-shift/blob/main/SECURITY.md).
-
-  - type: dropdown
-    id: component
+        Thanks for taking the time to report a bug. Please fill out the sections below so the maintainers can reproduce and address the issue.
+  - type: textarea
+    id: description
     attributes:
-      label: Component
-      options:
-        - src (the Pulumi AWS stack)
-        - .github/workflows (CI and the agent schedule)
-        - dev container
-        - tests
-        - documentation
-        - not sure
+      label: Description
+      description: A clear and concise description of the bug.
+      placeholder: Describe what happened and what you expected to happen instead.
     validations:
       required: true
-
   - type: textarea
-    id: what-happened
+    id: steps-to-reproduce
     attributes:
-      label: What happened
-      description: What you observed, and what you expected instead.
-    validations:
-      required: true
-
-  - type: textarea
-    id: reproduce
-    attributes:
-      label: Steps to reproduce
+      label: Steps to Reproduce
+      description: How can we reproduce the issue?
       placeholder: |
-        1. bun install
-        2. bun run ...
-        3. ...
+        1. Run workflow with runner label '...'
+        2. Step that triggers the issue
+        3. Observe the error
     validations:
       required: true
-
   - type: textarea
-    id: logs
+    id: expected-behavior
     attributes:
-      label: Logs or output
-      description: >
-        Paste the relevant output. Please redact bucket names, account IDs and ARNs you would
-        rather not publish — the shape of the error is usually what matters.
-      render: shell
-
-  - type: input
-    id: versions
-    attributes:
-      label: Versions
-      description: Output of `bun --version`, `node --version`, and `pulumi version` if relevant.
-      placeholder: bun 1.3.14, node v24.19.0, pulumi v3.256.0
+      label: Expected Behavior
+      description: What did you expect to happen?
     validations:
       required: true
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual Behavior
+      description: What actually happened? Include error messages or logs if available.
+    validations:
+      required: true
+  - type: input
+    id: runner-label
+    attributes:
+      label: Runner Label
+      description: Which runner label were you using when the issue occurred?
+      placeholder: "e.g. linux, linux-arm64, copilot-coding-agent"
+    validations:
+      required: false
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      description: Which environment did this occur in?
+      options:
+        - dev
+        - prd
+        - Unknown
+    validations:
+      required: false
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other context, screenshots, or log snippets that might help.
+    validations:
+      required: false

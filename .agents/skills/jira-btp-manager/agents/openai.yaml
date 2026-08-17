@@ -1,0 +1,4 @@
+interface:
+  display_name: "Jira BTP Manager"
+  short_description: "Manage BTP Jira issues via CLI"
+  default_prompt: "Use this skill to create, search, update, and transition BTP Jira issues with the Atlassian CLI, maintain aligned local tasks in tasks/todo, tasks/in-progress, and tasks/done, require the standard task description template with Context/Scope/Plan/Validation sections, and enforce lifecycle management from To Do -> In Progress -> In Review -> Done with validation evidence and verified completion-note comments."

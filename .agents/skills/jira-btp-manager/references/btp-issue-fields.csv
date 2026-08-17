@@ -1,0 +1,83 @@
+IssueType,IssueTypeId,FieldName,FieldKey,FieldId,FieldType,Custom,System,Required
+Initiative,10114,Summary,summary,summary,string,false,true,true
+Initiative,10114,Reporter,reporter,reporter,user,false,true,true
+Initiative,10114,Project,project,project,project,false,true,true
+Initiative,10114,Issue Type,issuetype,issuetype,issuetype,false,true,true
+Initiative,10114,Assignee,assignee,assignee,user,false,true,false
+Initiative,10114,Priority,priority,priority,priority,false,true,false
+Initiative,10114,Description,description,description,string,false,true,false
+Initiative,10114,Due date,duedate,duedate,date,false,true,false
+Initiative,10114,Linked Issues,issuelinks,issuelinks,array<issuelinks>,false,true,false
+Initiative,10114,Labels,labels,labels,array<string>,false,true,false
+Initiative,10114,Parent,parent,parent,issuelink,false,true,false
+Initiative,10114,Components,components,components,array<component>,false,true,false
+Initiative,10114,Attachment,attachment,attachment,array<attachment>,false,true,false
+Initiative,10114,Team,customfield_10001,customfield_10001,team,true,false,false
+Initiative,10114,Start date,customfield_10015,customfield_10015,date,true,false,false
+Initiative,10114,Acceptance Criteria,customfield_10094,customfield_10094,textarea,true,false,false
+Initiative,10114,Functional Area,customfield_10139,customfield_10139,select,true,false,false
+Initiative,10114,T-Shirt Size,customfield_10182,customfield_10182,select,true,false,false
+Initiative,10114,Business Owner,customfield_10616,customfield_10616,userpicker,true,false,false
+Initiative,10114,Engineering Lead,customfield_10645,customfield_10645,userpicker,true,false,false
+Initiative,10114,Business Sponsor,customfield_10710,customfield_10710,userpicker,true,false,false
+Initiative,10114,GxP Validated,customfield_10734,customfield_10734,select,true,false,false
+Initiative,10114,Product Manager,customfield_11311,customfield_11311,userpicker,true,false,false
+Initiative,10114,Overall Status,customfield_11578,customfield_11578,select,true,false,false
+Initiative,10114,Build / Run,customfield_12062,customfield_12062,select,true,false,false
+Initiative,10114,Business Stakeholders,customfield_12772,customfield_12772,multiuserpicker,true,false,false
+Initiative,10114,TAGs,customfield_13106,customfield_13106,array<string>,true,false,false
+Feature / Capability,10611,Summary,summary,summary,string,false,true,true
+Feature / Capability,10611,Reporter,reporter,reporter,user,false,true,true
+Feature / Capability,10611,Project,project,project,project,false,true,true
+Feature / Capability,10611,Issue Type,issuetype,issuetype,issuetype,false,true,true
+Feature / Capability,10611,Assignee,assignee,assignee,user,false,true,false
+Feature / Capability,10611,Description,description,description,string,false,true,false
+Feature / Capability,10611,Due date,duedate,duedate,date,false,true,false
+Feature / Capability,10611,Linked Issues,issuelinks,issuelinks,array<issuelinks>,false,true,false
+Feature / Capability,10611,Labels,labels,labels,array<string>,false,true,false
+Feature / Capability,10611,Parent,parent,parent,issuelink,false,true,false
+Feature / Capability,10611,Components,components,components,array<component>,false,true,false
+Feature / Capability,10611,Team,customfield_10001,customfield_10001,team,true,false,false
+Feature / Capability,10611,Start date,customfield_10015,customfield_10015,date,true,false,false
+Feature / Capability,10611,Acceptance Criteria,customfield_10094,customfield_10094,textarea,true,false,false
+Feature / Capability,10611,Functional Area,customfield_10139,customfield_10139,select,true,false,false
+Feature / Capability,10611,T-Shirt Size,customfield_10182,customfield_10182,select,true,false,false
+Feature / Capability,10611,Business Owner,customfield_10616,customfield_10616,userpicker,true,false,false
+Feature / Capability,10611,GxP Validated,customfield_10734,customfield_10734,select,true,false,false
+Feature / Capability,10611,Overall Status,customfield_11578,customfield_11578,select,true,false,false
+Feature / Capability,10611,Build / Run,customfield_12062,customfield_12062,select,true,false,false
+Feature / Capability,10611,Business Stakeholders,customfield_12772,customfield_12772,multiuserpicker,true,false,false
+Feature / Capability,10611,TAGs,customfield_13106,customfield_13106,array<string>,true,false,false
+Epic,10000,Summary,summary,summary,string,false,true,true
+Epic,10000,Reporter,reporter,reporter,user,false,true,true
+Epic,10000,Project,project,project,project,false,true,true
+Epic,10000,Issue Type,issuetype,issuetype,issuetype,false,true,true
+Story,10001,Summary,summary,summary,string,false,true,true
+Story,10001,Reporter,reporter,reporter,user,false,true,true
+Story,10001,Project,project,project,project,false,true,true
+Story,10001,Issue Type,issuetype,issuetype,issuetype,false,true,true
+Story,10001,Sprint,customfield_10020,customfield_10020,array<sprint>,true,false,false
+Story,10001,Story Points,customfield_10130,customfield_10130,float,true,false,false
+Story,10001,Reviewer,customfield_10210,customfield_10210,userpicker,true,false,false
+Story,10001,Requestor Email,customfield_10225,customfield_10225,text,true,false,false
+Story,10001,Type,customfield_12912,customfield_12912,select,true,false,false
+Story,10001,Technical Refinement,customfield_12467,customfield_12467,textarea,true,false,false
+Story,10001,Participants,customfield_12652,customfield_12652,multiuserpicker,true,false,false
+Story,10001,TAGs,customfield_13106,customfield_13106,array<string>,true,false,false
+Story,10001,Time tracking,timetracking,timetracking,timetracking,false,true,false
+Task,10002,Summary,summary,summary,string,false,true,true
+Task,10002,Reporter,reporter,reporter,user,false,true,true
+Task,10002,Project,project,project,project,false,true,true
+Task,10002,Issue Type,issuetype,issuetype,issuetype,false,true,true
+Task,10002,Sprint,customfield_10020,customfield_10020,array<sprint>,true,false,false
+Task,10002,Story Points,customfield_10130,customfield_10130,float,true,false,false
+Task,10002,Reviewer,customfield_10210,customfield_10210,userpicker,true,false,false
+Task,10002,Requestor Email,customfield_10225,customfield_10225,text,true,false,false
+Task,10002,Type,customfield_12912,customfield_12912,select,true,false,false
+Task,10002,Participants,customfield_12652,customfield_12652,multiuserpicker,true,false,false
+Task,10002,TAGs,customfield_13106,customfield_13106,array<string>,true,false,false
+Task,10002,Time tracking,timetracking,timetracking,timetracking,false,true,false
+Spike,10078,Summary,summary,summary,string,false,true,true
+Spike,10078,Reporter,reporter,reporter,user,false,true,true
+Spike,10078,Project,project,project,project,false,true,true
+Spike,10078,Issue Type,issuetype,issuetype,issuetype,false,true,true

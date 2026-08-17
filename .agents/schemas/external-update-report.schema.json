@@ -1,0 +1,64 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "external-update-report.schema.json",
+    "title": "External Update Report",
+    "description": "Raw output schema for external blog and release monitoring. Produced by checking RSS feeds, GitHub releases, and blog posts.",
+    "type": "object",
+    "required": ["timestamp", "findings"],
+    "properties": {
+        "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp of when the check was run."
+        },
+        "findings": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": ["source", "title", "url", "published_date", "relevance"],
+                "properties": {
+                    "source": {
+                        "type": "string",
+                        "enum": [
+                            "aws-eks-blog",
+                            "github-actions-arc",
+                            "pulumi-releases",
+                            "github-blog"
+                        ],
+                        "description": "Which monitored source this finding came from."
+                    },
+                    "title": {
+                        "type": "string",
+                        "description": "Title of the blog post, release, or announcement."
+                    },
+                    "url": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Direct URL to the source content."
+                    },
+                    "published_date": {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Publication date of the content."
+                    },
+                    "summary": {
+                        "type": "string",
+                        "description": "Brief summary of the content and why it may be relevant."
+                    },
+                    "relevance": {
+                        "type": "string",
+                        "enum": ["high", "medium", "low"],
+                        "description": "How relevant this finding is to the github-runners-eks project. High = directly affects deployed components. Medium = related technology or pattern. Low = tangentially related."
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": { "type": "string" },
+                        "description": "Keywords for categorization (e.g., 'eks', 'arc', 'pulumi', 'security', 'networking')."
+                    }
+                },
+                "additionalProperties": false
+            }
+        }
+    },
+    "additionalProperties": false
+}

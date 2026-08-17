@@ -1,43 +1,53 @@
-name: Feature request
-description: Suggest a capability or a change of direction
-labels: [enhancement]
+name: Feature Request
+description: Suggest a new feature or improvement
+labels: ["kind:feature", "status:needs-triage"]
 body:
   - type: markdown
     attributes:
       value: |
-        Night Shift is a pattern demonstration: coding agents maintaining the self-hosted Actions
-        infrastructure they run on. Requests that widen what agents may change without a human
-        are the ones worth thinking hardest about.
-
+        Have an idea for a new feature or an improvement to the self-hosted runners? Describe it below.
   - type: textarea
     id: problem
     attributes:
-      label: The problem
-      description: What are you unable to do today? Describe the situation, not the solution.
+      label: Problem Statement
+      description: What problem does this feature solve? What pain point are you experiencing?
+      placeholder: "I'm always frustrated when..."
     validations:
       required: true
-
   - type: textarea
-    id: proposal
+    id: proposed-solution
     attributes:
-      label: What you would like to happen
+      label: Proposed Solution
+      description: Describe the solution you'd like to see.
     validations:
       required: true
-
   - type: textarea
     id: alternatives
     attributes:
-      label: Alternatives you considered
-      description: Including doing nothing, and why that is not enough.
-
-  - type: checkboxes
-    id: scope
+      label: Alternatives Considered
+      description: Have you considered any alternative approaches? If so, describe them.
+    validations:
+      required: false
+  - type: dropdown
+    id: category
     attributes:
-      label: Scope
+      label: Category
+      description: What area does this feature relate to?
       options:
-        - label: >
-            If this lets an agent change something new, the change is either reversible without a
-            human or gated behind an explicit approval — not merely unlikely to go wrong.
-        - label: >
-            This does not grant the runner fleet permissions beyond what the work in front of it
-            needs.
+        - Runner configuration
+        - Runner labels / scale sets
+        - Networking / proxy
+        - Security
+        - Observability / logging
+        - Documentation
+        - CI/CD workflow integration
+        - Other
+    validations:
+      required: false
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other context, mockups, or references that might help.
+    validations:
+      required: false

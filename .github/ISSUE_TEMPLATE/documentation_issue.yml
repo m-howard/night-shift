@@ -1,0 +1,37 @@
+name: Documentation Issue
+description: Report missing, incorrect, or unclear documentation
+labels: ["kind:docs", "status:needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Help us improve the documentation. Let us know what's missing, wrong, or confusing.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What is wrong or missing in the documentation?
+    validations:
+      required: true
+  - type: input
+    id: page-or-section
+    attributes:
+      label: Page or Section
+      description: Which document or section is affected?
+      placeholder: "e.g. docs/user_docs/quickstart.md, README 'Quick Start' section"
+    validations:
+      required: false
+  - type: textarea
+    id: suggested-change
+    attributes:
+      label: Suggested Change
+      description: How would you improve it? Include corrected text or an outline if possible.
+    validations:
+      required: false
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other context or screenshots.
+    validations:
+      required: false

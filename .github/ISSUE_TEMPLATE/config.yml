@@ -1,5 +1,8 @@
-blank_issues_enabled: true
+blank_issues_enabled: false
 contact_links:
-  - name: Security vulnerability
-    url: https://github.com/m-howard/night-shift/security/advisories/new
-    about: Report privately. Please do not open a public issue.
+  - name: Security Vulnerability
+    url: https://github.com/modernatx-internal/github-runners-eks/blob/main/SECURITY.md
+    about: Please report security vulnerabilities privately. Do not open a issue.
+  - name: User Documentation
+    url: https://github.com/modernatx-internal/github-runners-eks/blob/main/docs/user_docs/README.md
+    about: Browse the user documentation before opening an issue.

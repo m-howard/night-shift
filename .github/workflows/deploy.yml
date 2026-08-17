@@ -1,0 +1,450 @@
+name: Deploy
+
+on:
+    workflow_dispatch:
+        inputs:
+            environment:
+                description: Target environment
+                required: true
+                type: choice
+                default: dev
+                options:
+                    - dev
+                    - val
+                    - prd
+            scope:
+                description: Comma-separated deployment layers to target
+                required: true
+                type: string
+                default: foundation,stateful-data,compute
+            preview_only:
+                description: Run validation and preview without deploy
+                required: true
+                type: boolean
+                default: false
+            skip_previews:
+                description: Skip stack preview jobs and only validate before deploy
+                required: true
+                type: boolean
+                default: false
+
+permissions:
+    contents: read
+    id-token: write
+
+env:
+    NODE_VERSION: '22'
+    AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+    PULUMI_ORG: ${{ vars.PULUMI_ORG || 'moderna' }}
+    PULUMI_TEAM_NAME: ${{ vars.PULUMI_TEAM_NAME }}
+
+jobs:
+    plan:
+        name: Plan Target Stacks
+        runs-on: [self-hosted, linux, x64, bootstrap-github-runner]
+        timeout-minutes: 30
+        outputs:
+            foundation: ${{ steps.scope.outputs.foundation }}
+            stateful_data: ${{ steps.scope.outputs.stateful_data }}
+            compute: ${{ steps.scope.outputs.compute }}
+
+        steps:
+            - name: Resolve workflow inputs
+              id: scope
+              env:
+                  SCOPE: ${{ inputs.scope }}
+              run: |
+                  foundation=false
+                  stateful_data=false
+                  compute=false
+
+                  if [[ ! "$SCOPE" =~ ^[a-zA-Z0-9,_-]+$ ]]; then
+                    echo "::error::scope contains unsupported characters"
+                    exit 1
+                  fi
+
+                  IFS=',' read -ra requested_scopes <<< "$SCOPE"
+                  for raw_scope in "${requested_scopes[@]}"; do
+                    scope="$(echo "$raw_scope" | xargs)"
+
+                    case "$scope" in
+                      foundation)
+                        foundation=true
+                        ;;
+                      stateful-data)
+                        stateful_data=true
+                        ;;
+                      compute)
+                        compute=true
+                        ;;
+                      '')
+                        ;;
+                      *)
+                        echo "::error::unsupported scope '$scope'. Allowed values: foundation,stateful-data,compute"
+                        exit 1
+                        ;;
+                    esac
+                  done
+
+                  if [[ "$foundation" == false && "$stateful_data" == false && "$compute" == false ]]; then
+                    echo "::error::no stacks selected"
+                    exit 1
+                  fi
+
+                  echo "foundation=$foundation" >> "$GITHUB_OUTPUT"
+                  echo "stateful_data=$stateful_data" >> "$GITHUB_OUTPUT"
+                  echo "compute=$compute" >> "$GITHUB_OUTPUT"
+
+    validate:
+        name: Validate Repository
+        needs: [plan]
+        runs-on: [self-hosted, linux, x64, bootstrap-github-runner]
+        timeout-minutes: 30
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+              with:
+                  ref: ${{ github.sha }}
+                  fetch-depth: 1
+
+            - name: Setup Node.js
+              uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  cache: npm
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Run lint
+              run: npm run lint
+
+            - name: Run format
+              run: npm run format
+
+            - name: Build TypeScript
+              run: npm run build
+
+            - name: Setup Pulumi
+              uses: pulumi/setup-pulumi@b374ceb6168550de27c6eba92e01c1a774040e11
+              with:
+                  pulumi-version: 3.210.0
+
+            - name: Authenticate with Pulumi Cloud
+              uses: pulumi/auth-actions@1c89817aab0c66407723cdef72b05266e7376640
+              with:
+                  organization: ${{ env.PULUMI_ORG }}
+                  requested-token-type: urn:pulumi:token-type:access_token:team
+                  scope: team:${{ env.PULUMI_TEAM_NAME }}
+
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a
+              with:
+                  role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+                  aws-region: ${{ env.AWS_REGION }}
+
+    preview-foundation:
+        name: Preview Foundation Stack
+        needs: [plan, validate]
+        if: ${{ !inputs.skip_previews && needs.plan.outputs.foundation == 'true' }}
+        environment:
+            name: ${{ inputs.environment }}
+        runs-on: [self-hosted, linux, x64, bootstrap-github-runner]
+        timeout-minutes: 120
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+              with:
+                  ref: ${{ github.sha }}
+                  fetch-depth: 1
+
+            - name: Setup Node.js
+              uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  cache: npm
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Setup Pulumi
+              uses: pulumi/setup-pulumi@b374ceb6168550de27c6eba92e01c1a774040e11
+              with:
+                  pulumi-version: 3.210.0
+
+            - name: Authenticate with Pulumi Cloud
+              uses: pulumi/auth-actions@1c89817aab0c66407723cdef72b05266e7376640
+              with:
+                  organization: ${{ env.PULUMI_ORG }}
+                  requested-token-type: urn:pulumi:token-type:access_token:team
+                  scope: team:${{ env.PULUMI_TEAM_NAME }}
+
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a
+              with:
+                  role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+                  aws-region: ${{ env.AWS_REGION }}
+
+            - name: Preview foundation
+              env:
+                  TARGET_ENV: ${{ inputs.environment }}
+              run: npm run preview -- "$TARGET_ENV" --scope foundation
+
+    preview-stateful-data:
+        name: Preview Stateful Data Stack
+        needs: [plan, validate, preview-foundation]
+        if: ${{ !inputs.skip_previews && always() && needs.plan.outputs.stateful_data == 'true' && (needs.plan.outputs.foundation != 'true' || needs.preview-foundation.result == 'success') }}
+        environment:
+            name: ${{ inputs.environment }}
+        runs-on: [self-hosted, linux, x64, bootstrap-github-runner]
+        timeout-minutes: 120
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+              with:
+                  ref: ${{ github.sha }}
+                  fetch-depth: 1
+
+            - name: Setup Node.js
+              uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  cache: npm
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Setup Pulumi
+              uses: pulumi/setup-pulumi@b374ceb6168550de27c6eba92e01c1a774040e11
+              with:
+                  pulumi-version: 3.210.0
+
+            - name: Authenticate with Pulumi Cloud
+              uses: pulumi/auth-actions@1c89817aab0c66407723cdef72b05266e7376640
+              with:
+                  organization: ${{ env.PULUMI_ORG }}
+                  requested-token-type: urn:pulumi:token-type:access_token:team
+                  scope: team:${{ env.PULUMI_TEAM_NAME }}
+
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a
+              with:
+                  role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+                  aws-region: ${{ env.AWS_REGION }}
+
+            - name: Preview stateful-data
+              env:
+                  TARGET_ENV: ${{ inputs.environment }}
+              run: npm run preview -- "$TARGET_ENV" --scope stateful-data
+
+    preview-compute:
+        name: Preview Compute Stack
+        needs: [plan, validate, preview-stateful-data]
+        if: ${{ !inputs.skip_previews && always() && needs.plan.outputs.compute == 'true' && (needs.plan.outputs.stateful_data != 'true' || needs.preview-stateful-data.result == 'success') }}
+        environment:
+            name: ${{ inputs.environment }}
+        runs-on: [self-hosted, linux, x64, bootstrap-github-runner]
+        timeout-minutes: 120
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+              with:
+                  ref: ${{ github.sha }}
+                  fetch-depth: 1
+
+            - name: Setup Node.js
+              uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  cache: npm
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Setup Pulumi
+              uses: pulumi/setup-pulumi@b374ceb6168550de27c6eba92e01c1a774040e11
+              with:
+                  pulumi-version: 3.210.0
+
+            - name: Authenticate with Pulumi Cloud
+              uses: pulumi/auth-actions@1c89817aab0c66407723cdef72b05266e7376640
+              with:
+                  organization: ${{ env.PULUMI_ORG }}
+                  requested-token-type: urn:pulumi:token-type:access_token:team
+                  scope: team:${{ env.PULUMI_TEAM_NAME }}
+
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a
+              with:
+                  role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+                  aws-region: ${{ env.AWS_REGION }}
+
+            - name: Preview compute
+              env:
+                  TARGET_ENV: ${{ inputs.environment }}
+              run: npm run preview -- "$TARGET_ENV" --scope compute
+
+    deploy-foundation:
+        name: Deploy Foundation Stack
+        needs: [plan, validate, preview-foundation, preview-stateful-data, preview-compute]
+        if: ${{ always() && !inputs.preview_only && needs.validate.result == 'success' && needs.plan.outputs.foundation == 'true' && (inputs.skip_previews || needs.preview-foundation.result == 'success') }}
+        environment:
+            name: ${{ inputs.environment }}
+        runs-on: [self-hosted, linux, x64, bootstrap-github-runner]
+        timeout-minutes: 120
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+              with:
+                  ref: ${{ github.sha }}
+                  fetch-depth: 1
+
+            - name: Setup Node.js
+              uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  cache: npm
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Setup Pulumi
+              uses: pulumi/setup-pulumi@b374ceb6168550de27c6eba92e01c1a774040e11
+              with:
+                  pulumi-version: 3.210.0
+
+            - name: Authenticate with Pulumi Cloud
+              uses: pulumi/auth-actions@1c89817aab0c66407723cdef72b05266e7376640
+              with:
+                  organization: ${{ env.PULUMI_ORG }}
+                  requested-token-type: urn:pulumi:token-type:access_token:team
+                  scope: team:${{ env.PULUMI_TEAM_NAME }}
+
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a
+              with:
+                  role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+                  aws-region: ${{ env.AWS_REGION }}
+
+            - name: Deploy foundation
+              env:
+                  TARGET_ENV: ${{ inputs.environment }}
+              run: npm run deploy -- "$TARGET_ENV" --scope foundation
+
+    deploy-stateful-data:
+        name: Deploy Stateful Data Stack
+        needs:
+            [
+                plan,
+                validate,
+                preview-foundation,
+                preview-stateful-data,
+                preview-compute,
+                deploy-foundation,
+            ]
+        if: ${{ always() && !inputs.preview_only && needs.validate.result == 'success' && needs.plan.outputs.stateful_data == 'true' && (inputs.skip_previews || needs.preview-stateful-data.result == 'success') && (needs.plan.outputs.foundation != 'true' || needs.deploy-foundation.result == 'success') }}
+        environment:
+            name: ${{ inputs.environment }}
+        runs-on: [self-hosted, linux, x64, bootstrap-github-runner]
+        timeout-minutes: 120
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+              with:
+                  ref: ${{ github.sha }}
+                  fetch-depth: 1
+
+            - name: Setup Node.js
+              uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  cache: npm
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Setup Pulumi
+              uses: pulumi/setup-pulumi@b374ceb6168550de27c6eba92e01c1a774040e11
+              with:
+                  pulumi-version: 3.210.0
+
+            - name: Authenticate with Pulumi Cloud
+              uses: pulumi/auth-actions@1c89817aab0c66407723cdef72b05266e7376640
+              with:
+                  organization: ${{ env.PULUMI_ORG }}
+                  requested-token-type: urn:pulumi:token-type:access_token:team
+                  scope: team:${{ env.PULUMI_TEAM_NAME }}
+
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a
+              with:
+                  role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+                  aws-region: ${{ env.AWS_REGION }}
+
+            - name: Deploy stateful-data
+              env:
+                  TARGET_ENV: ${{ inputs.environment }}
+              run: npm run deploy -- "$TARGET_ENV" --scope stateful-data
+
+    deploy-compute:
+        name: Deploy Compute Stack
+        needs:
+            [
+                plan,
+                validate,
+                preview-foundation,
+                preview-stateful-data,
+                preview-compute,
+                deploy-foundation,
+                deploy-stateful-data,
+            ]
+        if: ${{ always() && !inputs.preview_only && needs.validate.result == 'success' && needs.plan.outputs.compute == 'true' && (inputs.skip_previews || needs.preview-compute.result == 'success') && (needs.plan.outputs.foundation != 'true' || needs.deploy-foundation.result == 'success') && (needs.plan.outputs.stateful_data != 'true' || needs.deploy-stateful-data.result == 'success') }}
+        environment:
+            name: ${{ inputs.environment }}
+        runs-on: [self-hosted, linux, x64, bootstrap-github-runner]
+        timeout-minutes: 120
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+              with:
+                  ref: ${{ github.sha }}
+                  fetch-depth: 1
+
+            - name: Setup Node.js
+              uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  cache: npm
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Setup Pulumi
+              uses: pulumi/setup-pulumi@b374ceb6168550de27c6eba92e01c1a774040e11
+              with:
+                  pulumi-version: 3.210.0
+
+            - name: Authenticate with Pulumi Cloud
+              uses: pulumi/auth-actions@1c89817aab0c66407723cdef72b05266e7376640
+              with:
+                  organization: ${{ env.PULUMI_ORG }}
+                  requested-token-type: urn:pulumi:token-type:access_token:team
+                  scope: team:${{ env.PULUMI_TEAM_NAME }}
+
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a
+              with:
+                  role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+                  aws-region: ${{ env.AWS_REGION }}
+
+            - name: Deploy compute
+              env:
+                  TARGET_ENV: ${{ inputs.environment }}
+              run: npm run deploy -- "$TARGET_ENV" --scope compute

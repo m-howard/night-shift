@@ -1,0 +1,57 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "dependency-report.schema.json",
+    "title": "Dependency Report",
+    "description": "Raw output schema for npm dependency version checks. Produced by parsing `npm outdated --json`.",
+    "type": "object",
+    "required": ["timestamp", "findings"],
+    "properties": {
+        "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp of when the check was run."
+        },
+        "findings": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": ["package", "current", "wanted", "latest", "type", "semver_change"],
+                "properties": {
+                    "package": {
+                        "type": "string",
+                        "description": "The npm package name."
+                    },
+                    "current": {
+                        "type": "string",
+                        "description": "Currently installed version (semver)."
+                    },
+                    "wanted": {
+                        "type": "string",
+                        "description": "Maximum version satisfying the declared range in package.json (semver)."
+                    },
+                    "latest": {
+                        "type": "string",
+                        "description": "Latest version available on the registry (semver)."
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": ["dependencies", "devDependencies"],
+                        "description": "Whether this is a production or development dependency."
+                    },
+                    "semver_change": {
+                        "type": "string",
+                        "enum": ["patch", "minor", "major"],
+                        "description": "The type of semver change from current to latest."
+                    },
+                    "changelog_url": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "URL to the changelog or release notes, if available."
+                    }
+                },
+                "additionalProperties": false
+            }
+        }
+    },
+    "additionalProperties": false
+}

@@ -1,0 +1,43 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "cluster-version-report.schema.json",
+    "title": "Cluster Version Report",
+    "description": "Raw output schema for EKS/Kubernetes version checks. Produced by querying cluster state and AWS supported versions.",
+    "type": "object",
+    "required": ["timestamp", "cluster_name", "current_version", "latest_supported_version"],
+    "properties": {
+        "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp of when the check was run."
+        },
+        "cluster_name": {
+            "type": "string",
+            "description": "Name of the EKS cluster."
+        },
+        "current_version": {
+            "type": "string",
+            "description": "Currently deployed Kubernetes version on the cluster."
+        },
+        "latest_supported_version": {
+            "type": "string",
+            "description": "Latest Kubernetes version supported by Amazon EKS."
+        },
+        "end_of_support_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Date when the current version reaches end of standard support, if known."
+        },
+        "upgrade_path": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Ordered list of version steps required to reach the latest supported version (EKS supports sequential minor version upgrades only)."
+        },
+        "release_notes_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL to the EKS release notes or Kubernetes changelog for the target version."
+        }
+    },
+    "additionalProperties": false
+}

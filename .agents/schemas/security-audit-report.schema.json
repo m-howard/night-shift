@@ -1,0 +1,68 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "security-audit-report.schema.json",
+    "title": "Security Audit Report",
+    "description": "Raw output schema for npm audit findings. Produced by parsing `npm audit --json`.",
+    "type": "object",
+    "required": ["timestamp", "findings"],
+    "properties": {
+        "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp of when the audit was run."
+        },
+        "findings": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": ["package", "severity", "title", "url", "vulnerable_versions"],
+                "properties": {
+                    "package": {
+                        "type": "string",
+                        "description": "The affected npm package name."
+                    },
+                    "severity": {
+                        "type": "string",
+                        "enum": ["info", "low", "moderate", "high", "critical"],
+                        "description": "npm audit severity level."
+                    },
+                    "title": {
+                        "type": "string",
+                        "description": "Vulnerability title from the advisory."
+                    },
+                    "url": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "URL to the security advisory (e.g., GitHub Advisory Database)."
+                    },
+                    "vulnerable_versions": {
+                        "type": "string",
+                        "description": "Semver range of affected versions."
+                    },
+                    "patched_versions": {
+                        "type": "string",
+                        "description": "Semver range of versions containing the fix, if available."
+                    },
+                    "dependency_path": {
+                        "type": "array",
+                        "items": { "type": "string" },
+                        "description": "Transitive dependency chain from the project root to the vulnerable package."
+                    },
+                    "cwe": {
+                        "type": "array",
+                        "items": { "type": "string" },
+                        "description": "CWE identifiers associated with this vulnerability."
+                    },
+                    "cvss_score": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 10,
+                        "description": "CVSS v3 base score, if available."
+                    }
+                },
+                "additionalProperties": false
+            }
+        }
+    },
+    "additionalProperties": false
+}

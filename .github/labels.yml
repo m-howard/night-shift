@@ -1,0 +1,62 @@
+# GitHub Issue Labels
+#
+# This file defines the canonical label set for the repository.
+# Labels are organized into namespaced groups so they sort predictably
+# in the GitHub UI and their purpose is obvious at a glance.
+#
+# To sync these labels to the repository, use the GitHub CLI:
+#
+#   gh label list                          # see current labels
+#   gh label create "name" --color "hex" --description "desc"
+#
+# Or use a label-sync tool such as github-label-sync:
+#
+#   npx github-label-sync --labels .github/labels.yml <owner>/<repo>
+#
+# ──────────────────────────────────────────────────────────────────────
+# KIND — what type of issue is this?
+# ──────────────────────────────────────────────────────────────────────
+
+- name: "kind:bug"
+  color: "d73a4a"
+  description: "Something isn't working"
+
+- name: "kind:feature"
+  color: "a2eeef"
+  description: "New feature or enhancement request"
+
+- name: "kind:docs"
+  color: "0075ca"
+  description: "Documentation improvement or correction"
+
+- name: "kind:support"
+  color: "d876e3"
+  description: "Question or help request"
+
+# ──────────────────────────────────────────────────────────────────────
+# STATUS — where is this issue in the triage/intake workflow?
+# ──────────────────────────────────────────────────────────────────────
+
+- name: "status:needs-triage"
+  color: "fbca04"
+  description: "New issue awaiting maintainer review"
+
+- name: "status:needs-info"
+  color: "e4e669"
+  description: "Waiting for more information from the reporter"
+
+- name: "status:accepted"
+  color: "0e8a16"
+  description: "Triaged and accepted for internal planning"
+
+- name: "status:mirrored-to-jira"
+  color: "1d76db"
+  description: "Accepted work has been created in internal Jira"
+
+- name: "status:duplicate"
+  color: "cfd3d7"
+  description: "This issue already exists"
+
+- name: "status:not-planned"
+  color: "ffffff"
+  description: "Will not be addressed"

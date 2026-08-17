@@ -1,0 +1,76 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "change-assessment.schema.json",
+    "title": "Change Assessment",
+    "description": "Universal output schema for all maintenance checks. Each finding produces one change assessment with risk/complexity scoring.",
+    "type": "object",
+    "required": [
+        "category",
+        "title",
+        "description",
+        "risk",
+        "complexity",
+        "recommended_action",
+        "breaking_changes",
+        "auto_actionable"
+    ],
+    "properties": {
+        "category": {
+            "type": "string",
+            "enum": ["dependency-update", "security-audit", "cluster-upgrade", "feature-discovery"],
+            "description": "The type of maintenance finding."
+        },
+        "title": {
+            "type": "string",
+            "description": "Short description of the finding.",
+            "maxLength": 200
+        },
+        "description": {
+            "type": "string",
+            "description": "Detailed explanation of the finding, its impact, and context."
+        },
+        "risk": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4,
+            "description": "Risk score aligned with bd priority. 0 = critical (breaking production, security vulnerability), 1 = high (end-of-support, significant regression risk), 2 = moderate (compatibility concerns, non-trivial testing), 3 = low (minor version bump, well-tested path), 4 = informational (nice-to-have, no urgency)."
+        },
+        "complexity": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4,
+            "description": "Implementation complexity. 0 = trivial (single command or config change), 1 = small (a few file edits, no architectural change), 2 = moderate (multiple components affected, testing required), 3 = large (cross-stack changes, migration steps), 4 = epic-scale (multi-sprint, architectural redesign)."
+        },
+        "current_state": {
+            "type": "object",
+            "description": "What exists today — version, configuration, or relevant current context.",
+            "additionalProperties": true
+        },
+        "recommended_action": {
+            "type": "string",
+            "description": "What should change and how."
+        },
+        "affected_files": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Workspace-relative file paths that would need to change."
+        },
+        "breaking_changes": {
+            "type": "boolean",
+            "description": "Whether this change introduces breaking changes to the project or its consumers."
+        },
+        "source_urls": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "format": "uri"
+            },
+            "description": "Reference URLs — release notes, blog posts, advisories, documentation."
+        },
+        "auto_actionable": {
+            "type": "boolean",
+            "description": "Whether this finding can be safely auto-PR'd without human review. True when: risk >= 3, complexity <= 1, no breaking changes."
+        }
+    },
+    "additionalProperties": false
+}
